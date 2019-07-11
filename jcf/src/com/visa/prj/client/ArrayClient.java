@@ -7,6 +7,11 @@ public class ArrayClient {
 
 	public static void main(String[] args) {
 		String[] names = { "Calvin", "George", "Lee", "Angelina", "Brad" };
+		int total = Arrays.stream(new int[]{ 1, 2, 3 })
+				.filter(i ->i>= 2)
+	.map(i ->i * 3)
+	.sum();
+		System.out.println(total);
 
 		// Arrays.sort(names);
 		/*
