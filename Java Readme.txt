@@ -872,4 +872,176 @@ class UserDaoDbImpl implements UserDao {
 		PriorityQueue
 
 
-	 
+	 https://github.com/BanuPrakash/visa_week1
+	 ================================================
+
+	 Day 5
+	 -----
+	 Lombok: https://projectlombok.org/features/GetterSetter
+
+	 @Getters
+	 @Setters
+	 @Constructors
+	 public class Product {
+	 	int id;
+	 	String name;
+	 }
+
+	 ------------
+
+	 OOP, Collections, Streams, JUnit, Annotations, Exception
+	 --------------------------------------------------------
+
+	 Java Concurrency ==> Multithreaded applications
+
+	 A process will have a unit of work, this unit of work is called a thread
+
+	 If a process has only one unit of work executing we say it is single threaded application
+	 Example: notepad, Sublime, Calculator, ...
+
+	 If a process has many concurrent units of work executing we say it is multi-threaded
+	 Examples: Eclipse, Word, Browser, etc
+
+	 Why Multi-threaded applications?
+	 	a) User experince--> Avoiding starvation
+	 	b) Resource Utilization
+	 		==> Sharing of Heap and loaded classes
+	 		==> Optimization of CPU idle time
+	 ============================
+	 To create a thread a class has to implement Runnable interface
+	 interface Runnable {
+	 	void run();
+	 }		
+
+	 Thread class control methods:
+	 	a) start()
+	 	b) sleep(long ms)
+	 	c) join()
+	 	d) yield()
+	 	e) interrupt()
+
+	 	Deprecated methods:
+	 	f) suspend()
+	 	g) resume()
+	 	i) stop()
+
+	 	run() {
+	 		while(!stop && getEmployee()) {
+	 				update employee HRA
+	 				update employee PF
+	 				update employee BASIC
+	 				update total salary
+	 		}
+	 	}
+===============
+	Inside Daemon thread
+
+	public void run() {
+		while(true) {
+			update system time to screen
+			every 1 min
+		}
+	}
+
+
+	Thread t1 =new Thread();
+	t1.start();
+
+	=============================
+sudo systemctl restart jnaaptivnc
+	Thread Safety:
+		A member is said to be thread safe if it doesn't get corrupted in multithreaded environment
+
+		a) Local Variables ==> Stack ==> Each thread seperate stack ==> Safe
+		b) Static variables ==> Metaspace/PermGen ==> shared by threads ==> not Safe
+		c) instance variables ==> Heap ==> shared by threads ==> not safe
+
+		=======
+
+		public class BankingService {
+			public void transfer(Account frAcc, Account toAcc, double amt) {
+				synchronized(frAcc) {
+					synchronized(toAcc) {
+						frAcc.withdraw(amt);
+						toAcc.deposit(amt);
+					}
+				}		
+			}
+			// acquires class lock
+			public synchronized static void doSomeTask() {
+
+			}
+		}
+		======================
+
+		New Thread APIs to overcome the limitations:
+
+		1) Thread Pool
+			start(); 
+				==> latency involved in creating a stack and pushing run()
+				==> There can't be a limit on # of threads created
+		2) Limitations in Runnable interface
+			a) doesn't return a value
+			b) doesn't throw an exception
+			interface Runnable {
+				void run();
+			}
+
+			Solved using Callable and Future:
+
+			interface Callable<V> {
+				V call() throws Exception;
+			}		
+
+			Future is a container to hold the return value of promise.
+
+		3) Problems of synchronized:
+			a) One lock per object
+				Account
+					personalData
+					balance
+
+					synchronized updateProfile()
+					synchronized deposit()
+					synchronized withdraw()	
+			b) Deadlock possibility
+
+				public class BankingService {
+					public void transfer(Account frAcc, Account toAcc, double amt) {
+						synchronized(frAcc) {
+							synchronized(toAcc) {
+								frAcc.withdraw(amt);
+								toAcc.deposit(amt);
+							}
+						}		
+				}
+
+				SB101 --> SB500  5000
+				SB500 --> SB101  6333
+
+
+
+				public class BankingService {
+					public void transfer(Account frAcc, Account toAcc, double amt) {
+						 if(frAcc.balLock.tryLock(1000)) {
+						 		try {
+						 			if(toAcc.tryLock(1000)) {
+						 				try {
+												frAcc.withdraw(amt);
+												toAcc.deposit(amt);
+											} finally {
+												toAcc.unlock();
+											}
+									 }
+								} finally {
+									frAcc.unlock();
+								}
+						 }
+						 	
+				}
+			c) Only Owner has to release
+
+				@Role("admin")
+				public void release() {
+					balLock.unlock();
+				}
